@@ -174,16 +174,17 @@ function setCanvasSize() {
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
 
-    // Physics calculations
+    // Physics calculations - adjusted for higher, longer arc
     if (isMobileDevice()) {
-        window.GRAVITY = canvas.height * 0.004;
-        window.JUMP_FORCE = -canvas.height * 0.04;
-        window.MAX_FALL_SPEED = canvas.height * 0.04;
+        window.GRAVITY = canvas.height * 0.003;      // Reduced gravity for longer hang time
+        window.JUMP_FORCE = -canvas.height * 0.05;   // Stronger initial jump force
+        window.MAX_FALL_SPEED = canvas.height * 0.035; // Slightly reduced fall speed
         window.OBSTACLE_SPEED = canvas.width * 0.008;
     } else {
-        window.GRAVITY = canvas.height * 0.004;
-        window.JUMP_FORCE = -canvas.height * 0.04;
-        window.MAX_FALL_SPEED = canvas.height * 0.04;
+        // Desktop physics (same values)
+        window.GRAVITY = canvas.height * 0.003;
+        window.JUMP_FORCE = -canvas.height * 0.05;
+        window.MAX_FALL_SPEED = canvas.height * 0.035;
         window.OBSTACLE_SPEED = canvas.width * 0.006;
     }
     
