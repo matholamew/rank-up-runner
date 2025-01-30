@@ -34,7 +34,8 @@ const player = {
     isDucking: false,
     currentFrame: 0,
     touchStartTime: 0,
-    touchTimer: null
+    touchTimer: null,
+    canJump: true  // New property to track if player can jump
 };
 
 window.assetLoaded = function() {
@@ -186,6 +187,7 @@ function resetGame() {
     player.isJumping = false;
     player.isDucking = false;
     player.height = player.normalHeight;
+    player.canJump = true;  // Reset jump ability when game restarts
     nextSpawnTime = 100;
     scoreElement.textContent = `Score: ${score}`;
 }
@@ -202,6 +204,7 @@ function updatePlayer() {
             GROUND_Y;
         player.velocityY = 0;
         player.isJumping = false;
+        player.canJump = true;  // Reset ability to jump when landing
     }
 }
 
@@ -323,14 +326,13 @@ function handleTouchEnd(event) {
     const touchDuration = Date.now() - (player.touchStartTime || 0);
     
     // Make jumping more responsive by using a shorter threshold
-    if (touchDuration < 200) {
+    if (touchDuration < 200 && player.canJump) {
         // Short tap - Jump
-        if (!player.isJumping) {
-            player.velocityY = window.JUMP_FORCE;
-            player.isJumping = true;
-            player.isDucking = false;
-            player.height = player.normalHeight;
-        }
+        player.velocityY = window.JUMP_FORCE;
+        player.isJumping = true;
+        player.canJump = false;  // Prevent double jumping
+        player.isDucking = false;
+        player.height = player.normalHeight;
     }
     
     // Always stop ducking on touch end if not jumping
