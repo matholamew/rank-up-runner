@@ -305,24 +305,16 @@ function handleTouchStart(event) {
     
     player.touchStartTime = Date.now();
     
-    player.touchTimer = requestAnimationFrame(function checkDuck() {
-        const touchDuration = Date.now() - player.touchStartTime;
-        if (!player.isJumping && touchDuration > window.longPressThreshold) {
-            player.isDucking = true;
-            player.height = player.duckedHeight;
-            player.y = GROUND_Y + (player.normalHeight - player.duckedHeight);
-        } else if (!gameOver) {
-            player.touchTimer = requestAnimationFrame(checkDuck);
-        }
-    });
+    // Start ducking immediately on touch
+    if (!player.isJumping) {
+        player.isDucking = true;
+        player.height = player.duckedHeight;
+        player.y = GROUND_Y + (player.normalHeight - player.duckedHeight);
+    }
 }
 
 function handleTouchEnd(event) {
     event.preventDefault();
-    
-    if (player.touchTimer) {
-        cancelAnimationFrame(player.touchTimer);
-    }
     
     const touchDuration = Date.now() - (player.touchStartTime || 0);
     
@@ -334,12 +326,11 @@ function handleTouchEnd(event) {
             player.isDucking = false;
             player.height = player.normalHeight;
         }
-    } else {
-        // End of long press - Stop ducking
-        if (!player.isJumping) {
-            player.isDucking = false;
-            player.height = player.normalHeight;
-            player.y = GROUND_Y;
-        }
+    }
+    // Always stop ducking on touch end if not jumping
+    if (!player.isJumping) {
+        player.isDucking = false;
+        player.height = player.normalHeight;
+        player.y = GROUND_Y;
     }
 } 
