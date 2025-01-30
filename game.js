@@ -105,18 +105,17 @@ function setCanvasSize() {
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
     
-    // Different physics for mobile and desktop
+    // Simpler physics calculations for exact 1/3 screen height jump
     if (isMobileDevice()) {
-        // Calculate jump force to reach exactly 1/3 screen height
-        window.GRAVITY = canvas.height * 0.002;  // Gentle gravity
-        window.JUMP_FORCE = -Math.sqrt(2 * canvas.height * 0.002 * (canvas.height / 3));  // Jump to 1/3 height
-        window.MAX_FALL_SPEED = Math.abs(window.JUMP_FORCE);  // Match jump force
+        window.GRAVITY = canvas.height * 0.004;
+        window.JUMP_FORCE = -canvas.height * 0.04;
+        window.MAX_FALL_SPEED = canvas.height * 0.04;
         window.OBSTACLE_SPEED = canvas.width * 0.008;
     } else {
-        // Desktop physics (same calculation)
-        window.GRAVITY = canvas.height * 0.002;
-        window.JUMP_FORCE = -Math.sqrt(2 * canvas.height * 0.002 * (canvas.height / 3));
-        window.MAX_FALL_SPEED = Math.abs(window.JUMP_FORCE);
+        // Desktop physics (same values)
+        window.GRAVITY = canvas.height * 0.004;
+        window.JUMP_FORCE = -canvas.height * 0.04;
+        window.MAX_FALL_SPEED = canvas.height * 0.04;
         window.OBSTACLE_SPEED = canvas.width * 0.006;
     }
     
@@ -133,9 +132,9 @@ class Obstacle {
         this.x = canvas.width;
         
         if (this.isHigh) {
-            // Adjust flying heights to match jump height
-            const minHeight = GROUND_Y - (canvas.height / 3) * 0.8;  // Slightly below max jump
-            const maxHeight = GROUND_Y - (canvas.height / 3) * 0.6;  // Higher than player needs to jump
+            // Adjust flying heights for 1/3 screen height jump
+            const minHeight = GROUND_Y - (canvas.height / 3);  // Exactly at jump height
+            const maxHeight = GROUND_Y - (canvas.height / 3) * 0.8;  // Slightly below max height
             this.y = Math.random() * (maxHeight - minHeight) + minHeight;
         } else {
             this.y = GROUND_Y + (ninja.normalHeight - this.height);
