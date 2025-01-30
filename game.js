@@ -74,7 +74,7 @@ function initGame() {
     canvas.addEventListener('touchstart', handleTouchStart);
     canvas.addEventListener('touchend', handleTouchEnd);
     
-    window.longPressThreshold = 300; // Increased time to trigger duck
+    window.longPressThreshold = 500; // Much longer time to trigger duck
 
     setCanvasSize();
     gameLoop();
@@ -312,7 +312,7 @@ function handleTouchStart(event) {
             player.height = player.duckedHeight;
             player.y = GROUND_Y + (player.normalHeight - player.duckedHeight);
         }
-    }, 100); // Short delay before ducking
+    }, 200); // Longer delay before ducking
 }
 
 function handleTouchEnd(event) {
@@ -326,11 +326,11 @@ function handleTouchEnd(event) {
     const touchDuration = Date.now() - (player.touchStartTime || 0);
     
     // Make jumping more responsive by using a shorter threshold
-    if (touchDuration < 200 && player.canJump) {
+    if (touchDuration < 300 && player.canJump) {  // More lenient jump timing
         // Short tap - Jump
         player.velocityY = window.JUMP_FORCE;
         player.isJumping = true;
-        player.canJump = false;  // Prevent double jumping
+        player.canJump = false;
         player.isDucking = false;
         player.height = player.normalHeight;
     }
