@@ -107,16 +107,16 @@ function setCanvasSize() {
     
     // Different physics for mobile and desktop
     if (isMobileDevice()) {
-        // Much gentler jump arc for mobile
-        window.GRAVITY = ninja.normalHeight * 0.08;      // Even stronger gravity
-        window.JUMP_FORCE = -ninja.normalHeight * 0.02;  // Extremely gentle jump
-        window.MAX_FALL_SPEED = ninja.normalHeight * 0.02; // Match jump force
-        window.OBSTACLE_SPEED = canvas.width * 0.008;    // Slightly faster for mobile
+        // Calculate jump force to reach exactly 1/3 screen height
+        window.GRAVITY = canvas.height * 0.002;  // Gentle gravity
+        window.JUMP_FORCE = -Math.sqrt(2 * canvas.height * 0.002 * (canvas.height / 3));  // Jump to 1/3 height
+        window.MAX_FALL_SPEED = Math.abs(window.JUMP_FORCE);  // Match jump force
+        window.OBSTACLE_SPEED = canvas.width * 0.008;
     } else {
-        // Desktop physics
-        window.GRAVITY = ninja.normalHeight * 0.04;
-        window.JUMP_FORCE = -ninja.normalHeight * 0.15;
-        window.MAX_FALL_SPEED = ninja.normalHeight * 0.15;
+        // Desktop physics (same calculation)
+        window.GRAVITY = canvas.height * 0.002;
+        window.JUMP_FORCE = -Math.sqrt(2 * canvas.height * 0.002 * (canvas.height / 3));
+        window.MAX_FALL_SPEED = Math.abs(window.JUMP_FORCE);
         window.OBSTACLE_SPEED = canvas.width * 0.006;
     }
     
@@ -133,9 +133,9 @@ class Obstacle {
         this.x = canvas.width;
         
         if (this.isHigh) {
-            // Adjust flying heights for much lower jump height
-            const minHeight = GROUND_Y - ninja.normalHeight * 0.5;  // Much lower flying height
-            const maxHeight = GROUND_Y - ninja.normalHeight * 0.3;  // Much lower maximum height
+            // Adjust flying heights to match jump height
+            const minHeight = GROUND_Y - (canvas.height / 3) * 0.8;  // Slightly below max jump
+            const maxHeight = GROUND_Y - (canvas.height / 3) * 0.6;  // Higher than player needs to jump
             this.y = Math.random() * (maxHeight - minHeight) + minHeight;
         } else {
             this.y = GROUND_Y + (ninja.normalHeight - this.height);
