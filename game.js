@@ -8,6 +8,7 @@ let score = 0;
 let gameOver = false;
 let frameCount = 0;
 let nextSpawnTime = 100;
+let gameStarted = false;
 
 // Game constants
 const ANIMATION_SPEED = 8;
@@ -223,6 +224,13 @@ class Obstacle {
 function handleTouchStart(event) {
     event.preventDefault();
     
+    if (!gameStarted) {
+        const startScreen = document.getElementById('startScreen');
+        startScreen.style.display = 'none';
+        gameStarted = true;
+        return;
+    }
+    
     // Store touch start time for jump detection
     ninja.touchStartTime = Date.now();
     
@@ -274,7 +282,9 @@ function resetGame() {
     ninja.height = ninja.normalHeight;
     ninja.canJump = true;
     nextSpawnTime = 100;
-    scoreElement.textContent = `Score: ${score}`;
+    scoreElement.textContent = `SCORE: ${score}`;
+    gameStarted = false;
+    document.getElementById('startScreen').style.display = 'flex';
 }
 
 function updateNinja() {
@@ -362,7 +372,7 @@ function gameLoop() {
         // Comment out debug info call
         // drawDebugInfo();
 
-        if (!gameOver) {
+        if (!gameOver && gameStarted) {
             frameCount++;
             
             // Draw ground line
@@ -393,7 +403,7 @@ function gameLoop() {
                     gameOver = true;
                 }
             }
-        } else {
+        } else if (gameOver) {
             const fontSize = canvas.height * 0.08;
             ctx.fillStyle = 'black';
             ctx.font = `${fontSize}px Arial`;

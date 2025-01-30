@@ -64,6 +64,34 @@
                 display: flex;
             }
         }
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+        
+        #startScreen h1 {
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: min(8vh, 64px);
+            margin-bottom: 4vh;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        #startScreen p {
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: min(4vh, 32px);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
     </style>
     <script src="game.js" defer></script>
 </head>
@@ -72,6 +100,10 @@
         Please rotate your device to landscape mode
     </div>
     <div id="gameContainer">
+        <div id="startScreen">
+            <h1>RANK UP RUNNER</h1>
+            <p>Tap to Start</p>
+        </div>
         <div id="score">Score: 0</div>
         <canvas id="gameCanvas"></canvas>
         <div style="display: none;" id="assets">
