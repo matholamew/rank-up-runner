@@ -105,11 +105,20 @@ function setCanvasSize() {
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
     
-    // Much lower, more natural jump arc
-    window.GRAVITY = ninja.normalHeight * 0.04;      // Higher gravity
-    window.JUMP_FORCE = -ninja.normalHeight * 0.15;  // Much lower jump force
-    window.MAX_FALL_SPEED = ninja.normalHeight * 0.15; // Lower max fall speed
-    window.OBSTACLE_SPEED = canvas.width * 0.006;
+    // Different physics for mobile and desktop
+    if (isMobileDevice()) {
+        // Extra gentle jump arc for mobile
+        window.GRAVITY = ninja.normalHeight * 0.06;      // Stronger gravity for mobile
+        window.JUMP_FORCE = -ninja.normalHeight * 0.12;  // Very gentle jump
+        window.MAX_FALL_SPEED = ninja.normalHeight * 0.12; // Match jump force
+        window.OBSTACLE_SPEED = canvas.width * 0.008;    // Slightly faster for mobile
+    } else {
+        // Desktop physics
+        window.GRAVITY = ninja.normalHeight * 0.04;
+        window.JUMP_FORCE = -ninja.normalHeight * 0.15;
+        window.MAX_FALL_SPEED = ninja.normalHeight * 0.15;
+        window.OBSTACLE_SPEED = canvas.width * 0.006;
+    }
     
     if (!gameOver) {
         ninja.y = GROUND_Y;
@@ -172,9 +181,8 @@ function handleTouchEnd(event) {
     const touchDuration = Date.now() - (ninja.touchStartTime || 0);
     
     if (touchDuration < 200 && ninja.canJump) {
-        // Add horizontal position-based jump force variation
-        const jumpForceMultiplier = 1.0 + (ninja.x / canvas.width) * 0.1;
-        ninja.velocityY = window.JUMP_FORCE * jumpForceMultiplier;
+        // Simple, consistent jump force
+        ninja.velocityY = window.JUMP_FORCE;
         ninja.isJumping = true;
         ninja.canJump = false;
         ninja.isDucking = false;
