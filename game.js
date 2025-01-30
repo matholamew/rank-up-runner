@@ -73,7 +73,7 @@ function initGame() {
     canvas.addEventListener('touchstart', handleTouchStart);
     canvas.addEventListener('touchend', handleTouchEnd);
     
-    window.longPressThreshold = 150; // milliseconds to trigger duck
+    window.longPressThreshold = 300; // Increased time to trigger duck
 
     setCanvasSize();
     gameLoop();
@@ -293,7 +293,7 @@ function gameLoop() {
 
 // Touch event handlers
 function handleTouchStart(event) {
-    event.preventDefault(); // Prevent default touch behaviors
+    event.preventDefault();
     
     if (gameOver) {
         resetGame();
@@ -302,20 +302,28 @@ function handleTouchStart(event) {
     
     player.touchStartTime = Date.now();
     
-    // Start ducking immediately on touch
-    if (!player.isJumping) {
-        player.isDucking = true;
-        player.height = player.duckedHeight;
-        player.y = GROUND_Y + (player.normalHeight - player.duckedHeight);
-    }
+    // Don't start ducking immediately, wait for the threshold
+    player.touchCheckTimer = setTimeout(() => {
+        if (!player.isJumping) {
+            player.isDucking = true;
+            player.height = player.duckedHeight;
+            player.y = GROUND_Y + (player.normalHeight - player.duckedHeight);
+        }
+    }, 100); // Short delay before ducking
 }
 
 function handleTouchEnd(event) {
     event.preventDefault();
     
+    // Clear the duck check timer
+    if (player.touchCheckTimer) {
+        clearTimeout(player.touchCheckTimer);
+    }
+    
     const touchDuration = Date.now() - (player.touchStartTime || 0);
     
-    if (touchDuration < window.longPressThreshold) {
+    // Make jumping more responsive by using a shorter threshold
+    if (touchDuration < 200) {
         // Short tap - Jump
         if (!player.isJumping) {
             player.velocityY = window.JUMP_FORCE;
@@ -324,6 +332,7 @@ function handleTouchEnd(event) {
             player.height = player.normalHeight;
         }
     }
+    
     // Always stop ducking on touch end if not jumping
     if (!player.isJumping) {
         player.isDucking = false;
