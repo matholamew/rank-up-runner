@@ -126,6 +126,13 @@ function setCanvasSize() {
     canvas.width = container.clientWidth;
     canvas.height = container.clientHeight;
     
+    console.log('Setting canvas size:', {
+        containerWidth: container.clientWidth,
+        containerHeight: container.clientHeight,
+        canvasWidth: canvas.width,
+        canvasHeight: canvas.height
+    });
+    
     GROUND_Y = canvas.height - (canvas.height * 0.2);
     
     // Set ninja size to a smaller proportion of game height
@@ -134,12 +141,25 @@ function setCanvasSize() {
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
     
-    // Simpler physics calculations for exact 1/3 screen height jump
+    console.log('Ninja dimensions:', {
+        normalHeight: ninja.normalHeight,
+        width: ninja.width,
+        duckedHeight: ninja.duckedHeight,
+        groundY: GROUND_Y
+    });
+
+    // Physics calculations
     if (isMobileDevice()) {
         window.GRAVITY = canvas.height * 0.004;
         window.JUMP_FORCE = -canvas.height * 0.04;
         window.MAX_FALL_SPEED = canvas.height * 0.04;
         window.OBSTACLE_SPEED = canvas.width * 0.008;
+        console.log('Mobile physics values:', {
+            gravity: window.GRAVITY,
+            jumpForce: window.JUMP_FORCE,
+            maxFallSpeed: window.MAX_FALL_SPEED,
+            obstacleSpeed: window.OBSTACLE_SPEED
+        });
     } else {
         // Desktop physics (same values)
         window.GRAVITY = canvas.height * 0.004;
@@ -257,6 +277,14 @@ function updateNinja() {
 function drawNinja() {
     const currentSprite = Math.floor(frameCount / ANIMATION_SPEED) % 2 === 0 ? 
         ninjaRun1 : ninjaRun2;
+
+    console.log('Drawing ninja:', {
+        x: ninja.x,
+        y: ninja.y,
+        width: ninja.width,
+        height: ninja.isDucking ? ninja.duckedHeight : ninja.normalHeight,
+        sprite: currentSprite ? 'loaded' : 'missing'
+    });
 
     ctx.drawImage(
         currentSprite,
