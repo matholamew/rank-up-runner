@@ -33,8 +33,9 @@ const ninja = {
 };
 
 function loadAssets() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         let assetsLoaded = 0;
+        let errors = 0;
         const totalAssets = 4;
         
         function assetLoaded() {
@@ -46,17 +47,36 @@ function loadAssets() {
             }
         }
 
+        function assetError(e) {
+            errors++;
+            console.error('Error loading asset:', e);
+            if (errors === totalAssets) {
+                reject('Failed to load game assets');
+            }
+        }
+
         // Get asset elements
         ninjaRun1 = document.getElementById('ninjaRun1');
         ninjaRun2 = document.getElementById('ninjaRun2');
         birdSprite = document.getElementById('bird');
         enemySprite = document.getElementById('enemy');
 
+        if (!ninjaRun1 || !ninjaRun2 || !birdSprite || !enemySprite) {
+            reject('Could not find one or more game assets');
+            return;
+        }
+
         // Set up load handlers
         ninjaRun1.onload = assetLoaded;
         ninjaRun2.onload = assetLoaded;
         birdSprite.onload = assetLoaded;
         enemySprite.onload = assetLoaded;
+
+        // Set up error handlers
+        ninjaRun1.onerror = assetError;
+        ninjaRun2.onerror = assetError;
+        birdSprite.onerror = assetError;
+        enemySprite.onerror = assetError;
 
         // Handle already loaded images
         if (ninjaRun1.complete) assetLoaded();
@@ -67,31 +87,47 @@ function loadAssets() {
 }
 
 async function initGame() {
-    // Get DOM elements
-    canvas = document.getElementById('gameCanvas');
-    ctx = canvas.getContext('2d');
-    scoreElement = document.getElementById('score');
+    try {
+        // Get DOM elements
+        canvas = document.getElementById('gameCanvas');
+        ctx = canvas.getContext('2d');
+        scoreElement = document.getElementById('score');
 
-    await loadAssets();
+        if (!canvas || !ctx || !scoreElement) {
+            throw new Error('Could not initialize game elements');
+        }
 
-    // Debug log to check if sprites are loaded
-    console.log('Sprites loaded:', {
-        ninjaRun1: ninjaRun1.complete,
-        ninjaRun2: ninjaRun2.complete,
-        bird: birdSprite.complete,
-        enemy: enemySprite.complete
-    });
+        console.log('Loading assets...');
+        await loadAssets();
+        console.log('Assets loaded successfully');
 
-    // Set up event listeners
-    window.addEventListener('resize', setCanvasSize);
-    canvas.addEventListener('touchstart', handleTouchStart);
-    canvas.addEventListener('touchend', handleTouchEnd);
+        // Debug log to check if sprites are loaded
+        console.log('Sprites loaded:', {
+            ninjaRun1: ninjaRun1.complete,
+            ninjaRun2: ninjaRun2.complete,
+            bird: birdSprite.complete,
+            enemy: enemySprite.complete
+        });
 
-    // Set initial ninja position
-    ninja.x = canvas.width * 0.2;
+        // Set up event listeners
+        window.addEventListener('resize', setCanvasSize);
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchend', handleTouchEnd);
 
-    setCanvasSize();
-    gameLoop();
+        // Set initial ninja position
+        ninja.x = canvas.width * 0.2;
+
+        setCanvasSize();
+        gameLoop();
+    } catch (error) {
+        console.error('Game initialization failed:', error);
+        // Display error message on canvas if possible
+        if (ctx) {
+            ctx.fillStyle = 'black';
+            ctx.font = '20px Arial';
+            ctx.fillText('Failed to load game. Please refresh.', 50, 50);
+        }
+    }
 }
 
 function setCanvasSize() {
@@ -323,4 +359,8 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-document.addEventListener('DOMContentLoaded', initGame); 
+// Wait for both DOM and window load to ensure everything is ready
+window.addEventListener('load', () => {
+    console.log('Window loaded, initializing game...');
+    initGame();
+}); 
