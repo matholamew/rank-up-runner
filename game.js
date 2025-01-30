@@ -49,17 +49,25 @@ function loadAssets() {
 
         function assetError(e) {
             errors++;
-            console.error('Error loading asset:', e);
+            console.error('Error loading asset:', e.target.id);
+            console.error('Source:', e.target.src);
             if (errors === totalAssets) {
                 reject('Failed to load game assets');
             }
         }
 
-        // Get asset elements
+        // Get asset elements and log their paths
         ninjaRun1 = document.getElementById('ninjaRun1');
         ninjaRun2 = document.getElementById('ninjaRun2');
         birdSprite = document.getElementById('bird');
         enemySprite = document.getElementById('enemy');
+
+        console.log('Asset paths:', {
+            ninjaRun1: ninjaRun1?.src,
+            ninjaRun2: ninjaRun2?.src,
+            bird: birdSprite?.src,
+            enemy: enemySprite?.src
+        });
 
         if (!ninjaRun1 || !ninjaRun2 || !birdSprite || !enemySprite) {
             reject('Could not find one or more game assets');
