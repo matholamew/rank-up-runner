@@ -22,26 +22,10 @@
         #gameContainer {
             position: relative;
             width: 100vw;
-            height: 100vh;
+            height: 75vh;
             max-width: 160vh;
-            max-height: 50vw;
             margin: 2vh auto auto auto;
             background-color: #D2D2D2;
-        }
-        /* Add landscape mode specific styles */
-        @media (orientation: landscape) {
-            #gameContainer {
-                width: 100vw;
-                height: 75vh;
-                max-height: 75vh;
-                max-width: 160vh;
-                margin: 2vh auto auto auto;
-            }
-            #score {
-                font-size: min(4vh, 28px);
-                top: 15px;
-                right: 25px;
-            }
         }
         canvas {
             position: absolute;
@@ -50,30 +34,51 @@
             width: 100%;
             height: 100%;
             border: 2px solid black;
-            background-color: #D2D2D2;
         }
         #score {
             position: absolute;
             top: 20px;
             right: 20px;
             font-family: Arial, sans-serif;
-            font-size: min(3vw, 24px);
+            font-size: min(4vh, 28px);
             color: #000;
             font-weight: bold;
             z-index: 1;
         }
+        #rotatePrompt {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            z-index: 100;
+        }
+        @media (orientation: portrait) {
+            #rotatePrompt {
+                display: flex;
+            }
+        }
     </style>
 </head>
 <body>
+    <div id="rotatePrompt">
+        Please rotate your device to landscape mode
+    </div>
     <div id="gameContainer">
         <div id="score">Score: 0</div>
         <canvas id="gameCanvas"></canvas>
         <script src="game.js"></script>
         <div style="display: none;" id="assets">
-            <img id="playerSprite1" src="assets/images/player1.png" alt="Player running frame 1" onload="assetLoaded()">
-            <img id="playerSprite2" src="assets/images/player2.png" alt="Player running frame 2" onload="assetLoaded()">
-            <img id="trashcan" src="assets/images/trashcan.png" alt="Trashcan obstacle" onload="assetLoaded()">
+            <img id="ninjaRun1" src="assets/images/ninja-run1.png" alt="Ninja running frame 1" onload="assetLoaded()">
+            <img id="ninjaRun2" src="assets/images/ninja-run2.png" alt="Ninja running frame 2" onload="assetLoaded()">
             <img id="bird" src="assets/images/bird.png" alt="Bird obstacle" onload="assetLoaded()">
+            <img id="enemy" src="assets/images/enemy.png" alt="Enemy obstacle" onload="assetLoaded()">
         </div>
     </div>
 </body>
