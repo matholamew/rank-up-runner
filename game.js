@@ -11,8 +11,11 @@ let nextSpawnTime = 100;
 // Game constants
 const ANIMATION_SPEED = 8;
 let GROUND_Y;
-const MIN_SPAWN_TIME = 70;
-const MAX_SPAWN_TIME = 170;
+
+// Add this function to detect mobile devices
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
 
 // Player object
 const player = {
@@ -105,10 +108,17 @@ function setCanvasSize() {
     
     GROUND_Y = canvas.height - (canvas.height * 0.25);
     
-    // Adjusted physics for longer jump arc
-    window.GRAVITY = canvas.height * 0.0012;    // Lower gravity for longer arc
-    window.JUMP_FORCE = -canvas.height * 0.025; // Lower initial force for more gradual rise
-    window.MAX_JUMP_VELOCITY = window.JUMP_FORCE; // Limit maximum jump speed
+    // Different physics values for mobile and desktop
+    if (isMobileDevice()) {
+        window.GRAVITY = canvas.height * 0.0018;    // Increased gravity for mobile
+        window.JUMP_FORCE = -canvas.height * 0.03;  // Stronger jump for mobile
+        window.OBSTACLE_SPEED = canvas.width * 0.006; // Faster obstacle movement for mobile
+    } else {
+        window.GRAVITY = canvas.height * 0.0012;
+        window.JUMP_FORCE = -canvas.height * 0.025;
+        window.OBSTACLE_SPEED = canvas.width * 0.004;
+    }
+    window.MAX_JUMP_VELOCITY = window.JUMP_FORCE;
     
     const scaleFactor = canvas.height / 1080;
     player.width = canvas.height * 0.15;
@@ -121,6 +131,7 @@ function setCanvasSize() {
     }
 }
 
+// Update Obstacle class move method
 class Obstacle {
     constructor() {
         this.isHigh = Math.random() > 0.8;  // Only 20% chance for birds, 80% for trashcans
@@ -138,7 +149,7 @@ class Obstacle {
     }
 
     move() {
-        this.x -= canvas.width * 0.004;
+        this.x -= window.OBSTACLE_SPEED;
     }
 
     draw() {
@@ -160,6 +171,12 @@ class Obstacle {
             );
         }
     }
+}
+
+// Update spawn times for mobile
+if (isMobileDevice()) {
+    const MIN_SPAWN_TIME = 50;  // Faster minimum spawn time for mobile
+    const MAX_SPAWN_TIME = 130; // Faster maximum spawn time for mobile
 }
 
 function resetGame() {
