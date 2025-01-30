@@ -30,25 +30,47 @@ const ninja = {
     canJump: true
 };
 
-// Asset loading
-window.assetLoaded = function() {
-    assetsLoaded++;
-    console.log('Asset loaded:', assetsLoaded);
-    if (assetsLoaded === totalAssets) {
-        console.log('All assets loaded, starting game');
-        initGame();
-    }
+function loadAssets() {
+    return new Promise((resolve) => {
+        let assetsLoaded = 0;
+        const totalAssets = 4;
+        
+        function assetLoaded() {
+            assetsLoaded++;
+            console.log('Asset loaded:', assetsLoaded);
+            if (assetsLoaded === totalAssets) {
+                console.log('All assets loaded');
+                resolve();
+            }
+        }
+
+        // Get asset elements
+        ninjaRun1 = document.getElementById('ninjaRun1');
+        ninjaRun2 = document.getElementById('ninjaRun2');
+        birdSprite = document.getElementById('bird');
+        enemySprite = document.getElementById('enemy');
+
+        // Set up load handlers
+        ninjaRun1.onload = assetLoaded;
+        ninjaRun2.onload = assetLoaded;
+        birdSprite.onload = assetLoaded;
+        enemySprite.onload = assetLoaded;
+
+        // Handle already loaded images
+        if (ninjaRun1.complete) assetLoaded();
+        if (ninjaRun2.complete) assetLoaded();
+        if (birdSprite.complete) assetLoaded();
+        if (enemySprite.complete) assetLoaded();
+    });
 }
 
-function initGame() {
+async function initGame() {
     // Get DOM elements
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
     scoreElement = document.getElementById('score');
-    ninjaRun1 = document.getElementById('ninjaRun1');
-    ninjaRun2 = document.getElementById('ninjaRun2');
-    birdSprite = document.getElementById('bird');
-    enemySprite = document.getElementById('enemy');
+
+    await loadAssets();
 
     // Debug log to check if sprites are loaded
     console.log('Sprites loaded:', {
@@ -64,7 +86,7 @@ function initGame() {
     canvas.addEventListener('touchend', handleTouchEnd);
 
     // Set initial ninja position
-    ninja.x = canvas.width * 0.2;  // Position ninja at 20% of screen width
+    ninja.x = canvas.width * 0.2;
 
     setCanvasSize();
     gameLoop();
@@ -285,4 +307,6 @@ function gameLoop() {
     }
 
     requestAnimationFrame(gameLoop);
-} 
+}
+
+document.addEventListener('DOMContentLoaded', initGame); 
