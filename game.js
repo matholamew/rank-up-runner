@@ -101,8 +101,6 @@ async function initGame() {
         
         // Force initial canvas size
         const container = document.getElementById('gameContainer');
-        canvas.style.width = '100%';
-        canvas.style.height = '100%';
         canvas.width = container.clientWidth;
         canvas.height = container.clientHeight;
 
