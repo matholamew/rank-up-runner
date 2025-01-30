@@ -105,10 +105,10 @@ function setCanvasSize() {
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
     
-    // Adjust physics for lower, more natural jump arc
-    window.GRAVITY = ninja.normalHeight * 0.025;     // Increased gravity
-    window.JUMP_FORCE = -ninja.normalHeight * 0.25;  // Reduced initial jump force
-    window.MAX_FALL_SPEED = ninja.normalHeight * 0.2; // Lower max fall speed
+    // Much lower, more natural jump arc
+    window.GRAVITY = ninja.normalHeight * 0.04;      // Higher gravity
+    window.JUMP_FORCE = -ninja.normalHeight * 0.15;  // Much lower jump force
+    window.MAX_FALL_SPEED = ninja.normalHeight * 0.15; // Lower max fall speed
     window.OBSTACLE_SPEED = canvas.width * 0.006;
     
     if (!gameOver) {
@@ -124,9 +124,9 @@ class Obstacle {
         this.x = canvas.width;
         
         if (this.isHigh) {
-            // Adjust flying heights for lower jump height
-            const minHeight = GROUND_Y - ninja.normalHeight * 0.8;  // Lower minimum height
-            const maxHeight = GROUND_Y - ninja.normalHeight * 0.6;  // Lower maximum height
+            // Adjust flying heights for much lower jump height
+            const minHeight = GROUND_Y - ninja.normalHeight * 0.5;  // Much lower flying height
+            const maxHeight = GROUND_Y - ninja.normalHeight * 0.3;  // Much lower maximum height
             this.y = Math.random() * (maxHeight - minHeight) + minHeight;
         } else {
             this.y = GROUND_Y + (ninja.normalHeight - this.height);
