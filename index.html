@@ -31,14 +31,15 @@
         /* Add landscape mode specific styles */
         @media (orientation: landscape) {
             #gameContainer {
-                width: 95vw; /* Almost full viewport width */
-                height: 85vh; /* Most of viewport height */
-                max-height: 85vh;
+                width: 95vw;
+                height: 75vh; /* Reduced height to ensure visibility */
+                max-height: 75vh;
                 max-width: 95vw;
+                margin-top: -5vh; /* Move up slightly to center better */
             }
             #score {
-                font-size: min(4vh, 28px); /* Larger score size */
-                top: 15px; /* Adjust position */
+                font-size: min(4vh, 28px);
+                top: 15px;
                 right: 25px;
             }
         }
