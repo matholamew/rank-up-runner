@@ -115,8 +115,10 @@ async function initGame() {
             isMobile: isMobileDevice()
         });
 
-        // Wait for assets to load
-        await loadAssets();
+        // Add touch handlers to the game container instead of just the canvas
+        const gameContainer = document.getElementById('gameContainer');
+        gameContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+        gameContainer.addEventListener('touchend', handleTouchEnd, { passive: false });
 
         // Set up event listeners
         window.addEventListener('resize', () => {
@@ -129,12 +131,6 @@ async function initGame() {
                 });
             }
         });
-
-        // Mobile-specific touch handlers
-        if (isMobileDevice()) {
-            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-            canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-        }
 
         // Set initial ninja position
         ninja.x = canvas.width * 0.05;
