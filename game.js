@@ -107,10 +107,10 @@ function setCanvasSize() {
     
     // Different physics for mobile and desktop
     if (isMobileDevice()) {
-        // Extra gentle jump arc for mobile
-        window.GRAVITY = ninja.normalHeight * 0.06;      // Stronger gravity for mobile
-        window.JUMP_FORCE = -ninja.normalHeight * 0.05;  // Very gentle jump
-        window.MAX_FALL_SPEED = ninja.normalHeight * 0.05; // Match jump force
+        // Much gentler jump arc for mobile
+        window.GRAVITY = ninja.normalHeight * 0.08;      // Even stronger gravity
+        window.JUMP_FORCE = -ninja.normalHeight * 0.02;  // Extremely gentle jump
+        window.MAX_FALL_SPEED = ninja.normalHeight * 0.02; // Match jump force
         window.OBSTACLE_SPEED = canvas.width * 0.008;    // Slightly faster for mobile
     } else {
         // Desktop physics
