@@ -87,29 +87,57 @@ async function initGame() {
     try {
         // Get DOM elements
         canvas = document.getElementById('gameCanvas');
-        ctx = canvas.getContext('2d');
-        scoreElement = document.getElementById('score');
+        if (!canvas) {
+            throw new Error('Canvas element not found');
+        }
 
-        console.log('Canvas size:', canvas.width, canvas.height);
+        ctx = canvas.getContext('2d');
+        if (!ctx) {
+            throw new Error('Could not get canvas context');
+        }
+
+        scoreElement = document.getElementById('score');
         
+        // Force initial canvas size
+        const container = document.getElementById('gameContainer');
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+
+        console.log('Initial canvas setup:', {
+            container: container ? 'found' : 'missing',
+            containerWidth: container?.clientWidth,
+            containerHeight: container?.clientHeight,
+            canvasWidth: canvas.width,
+            canvasHeight: canvas.height,
+            isMobile: isMobileDevice()
+        });
+
         // Wait for assets to load
         await loadAssets();
 
-        // Debug log to check if sprites are loaded
-        console.log('Sprites loaded:', {
-            ninjaRun1: ninjaRun1?.complete,
-            ninjaRun2: ninjaRun2?.complete,
-            bird: birdSprite?.complete,
-            enemy: enemySprite?.complete
+        // Set up event listeners
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            if (isMobileDevice()) {
+                // Force redraw on mobile after resize
+                requestAnimationFrame(() => {
+                    drawNinja();
+                    drawDebugInfo();
+                });
+            }
         });
 
-        // Set up event listeners
-        window.addEventListener('resize', setCanvasSize);
-        canvas.addEventListener('touchstart', handleTouchStart);
-        canvas.addEventListener('touchend', handleTouchEnd);
+        // Mobile-specific touch handlers
+        if (isMobileDevice()) {
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+        }
 
         // Set initial ninja position
         ninja.x = canvas.width * 0.2;
+        ninja.y = GROUND_Y;
 
         setCanvasSize();
         
@@ -123,30 +151,28 @@ async function initGame() {
 
 function setCanvasSize() {
     const container = document.getElementById('gameContainer');
+    const oldWidth = canvas.width;
+    const oldHeight = canvas.height;
+    
+    // Set canvas size
     canvas.width = container.clientWidth;
     canvas.height = container.clientHeight;
     
-    console.log('Setting canvas size:', {
-        containerWidth: container.clientWidth,
-        containerHeight: container.clientHeight,
-        canvasWidth: canvas.width,
-        canvasHeight: canvas.height
-    });
+    // Scale ninja position if canvas size changed
+    if (oldWidth !== 0 && oldHeight !== 0) {
+        ninja.x = (ninja.x / oldWidth) * canvas.width;
+        if (!ninja.isJumping) {
+            ninja.y = GROUND_Y;
+        }
+    }
     
     GROUND_Y = canvas.height - (canvas.height * 0.2);
     
-    // Set ninja size to a smaller proportion of game height
+    // Set ninja size
     ninja.normalHeight = canvas.height * 0.2;
     ninja.width = ninja.normalHeight * 0.8;
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
-    
-    console.log('Ninja dimensions:', {
-        normalHeight: ninja.normalHeight,
-        width: ninja.width,
-        duckedHeight: ninja.duckedHeight,
-        groundY: GROUND_Y
-    });
 
     // Physics calculations
     if (isMobileDevice()) {
@@ -154,21 +180,14 @@ function setCanvasSize() {
         window.JUMP_FORCE = -canvas.height * 0.04;
         window.MAX_FALL_SPEED = canvas.height * 0.04;
         window.OBSTACLE_SPEED = canvas.width * 0.008;
-        console.log('Mobile physics values:', {
-            gravity: window.GRAVITY,
-            jumpForce: window.JUMP_FORCE,
-            maxFallSpeed: window.MAX_FALL_SPEED,
-            obstacleSpeed: window.OBSTACLE_SPEED
-        });
     } else {
-        // Desktop physics (same values)
         window.GRAVITY = canvas.height * 0.004;
         window.JUMP_FORCE = -canvas.height * 0.04;
         window.MAX_FALL_SPEED = canvas.height * 0.04;
         window.OBSTACLE_SPEED = canvas.width * 0.006;
     }
     
-    if (!gameOver) {
+    if (!gameOver && !ninja.isJumping) {
         ninja.y = GROUND_Y;
     }
 }
@@ -329,6 +348,11 @@ function drawDebugInfo() {
 
 function gameLoop() {
     try {
+        if (!ctx) {
+            console.error('No canvas context in game loop');
+            return;
+        }
+
         ctx.fillStyle = '#D2D2D2';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
