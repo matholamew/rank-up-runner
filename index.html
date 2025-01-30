@@ -23,19 +23,19 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            max-width: 160vh; /* Shorter ratio */
-            max-height: 50vw; /* Shorter ratio */
-            margin: auto;
+            max-width: 160vh;
+            max-height: 50vw;
+            margin: -5vh auto auto auto;
             background-color: #D2D2D2;
         }
         /* Add landscape mode specific styles */
         @media (orientation: landscape) {
             #gameContainer {
                 width: 100vw;
-                height: 75vh; /* Reduced height to ensure visibility */
+                height: 75vh;
                 max-height: 75vh;
-                max-width: 160vh; /* Shorter ratio */
-                margin: auto;
+                max-width: 160vh;
+                margin: -2vh auto auto auto;
             }
             #score {
                 font-size: min(4vh, 28px);
