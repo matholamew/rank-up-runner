@@ -126,8 +126,8 @@ function setCanvasSize() {
     window.MAX_JUMP_VELOCITY = window.JUMP_FORCE;
     
     const scaleFactor = canvas.height / 1080;
-    player.width = canvas.height * 0.2;
-    player.normalHeight = canvas.height * 0.15;
+    player.width = canvas.height * 0.25;
+    player.normalHeight = canvas.height * 0.2;
     player.duckedHeight = player.normalHeight / 2;
     player.height = player.normalHeight;
     
@@ -141,8 +141,8 @@ class Obstacle {
     constructor() {
         this.isHigh = Math.random() > 0.8;  // Only 20% chance for birds, 80% for trashcans
         const scaleFactor = canvas.height / 1080;
-        this.width = canvas.height * 0.09;
-        this.height = canvas.height * 0.11;
+        this.width = canvas.height * 0.12;
+        this.height = canvas.height * 0.15;
         this.x = canvas.width;
         if (this.isHigh) {
             const groundLevel = GROUND_Y + (player.normalHeight - this.height);
