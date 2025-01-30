@@ -136,7 +136,7 @@ async function initGame() {
         }
 
         // Set initial ninja position
-        ninja.x = canvas.width * 0.1;
+        ninja.x = canvas.width * 0.05;
         ninja.y = GROUND_Y;
 
         setCanvasSize();
@@ -159,7 +159,7 @@ function setCanvasSize() {
     
     // Scale ninja position if canvas size changed
     if (oldWidth !== 0 && oldHeight !== 0) {
-        ninja.x = canvas.width * 0.1;
+        ninja.x = canvas.width * 0.05;
         if (!ninja.isJumping) {
             ninja.y = GROUND_Y;
         }
