@@ -106,14 +106,8 @@ async function initGame() {
         canvas.width = container.clientWidth;
         canvas.height = container.clientHeight;
 
-        console.log('Initial canvas setup:', {
-            container: container ? 'found' : 'missing',
-            containerWidth: container?.clientWidth,
-            containerHeight: container?.clientHeight,
-            canvasWidth: canvas.width,
-            canvasHeight: canvas.height,
-            isMobile: isMobileDevice()
-        });
+        // Wait for assets to load first
+        await loadAssets();
 
         // Add touch handlers to the game container instead of just the canvas
         const gameContainer = document.getElementById('gameContainer');
@@ -124,10 +118,8 @@ async function initGame() {
         window.addEventListener('resize', () => {
             setCanvasSize();
             if (isMobileDevice()) {
-                // Force redraw on mobile after resize
                 requestAnimationFrame(() => {
                     drawNinja();
-                    drawDebugInfo();
                 });
             }
         });
@@ -151,6 +143,7 @@ function setCanvasSize() {
     const oldWidth = canvas.width;
     const oldHeight = canvas.height;
     
+    // Ensure canvas matches container size
     canvas.width = container.clientWidth;
     canvas.height = container.clientHeight;
     
@@ -170,14 +163,13 @@ function setCanvasSize() {
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
 
-    // Physics calculations for exactly 1/3 game height jump
+    // Physics calculations
     if (isMobileDevice()) {
-        window.GRAVITY = canvas.height * 0.002;      // Balanced gravity
-        window.JUMP_FORCE = -canvas.height * 0.035;  // Force to reach 1/3 height
-        window.MAX_FALL_SPEED = canvas.height * 0.035; // Matching fall speed
+        window.GRAVITY = canvas.height * 0.002;
+        window.JUMP_FORCE = -canvas.height * 0.035;
+        window.MAX_FALL_SPEED = canvas.height * 0.035;
         window.OBSTACLE_SPEED = canvas.width * 0.008;
     } else {
-        // Desktop physics (same values)
         window.GRAVITY = canvas.height * 0.002;
         window.JUMP_FORCE = -canvas.height * 0.035;
         window.MAX_FALL_SPEED = canvas.height * 0.035;
