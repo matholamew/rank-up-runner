@@ -270,7 +270,12 @@ function resetGame() {
     nextSpawnTime = 100;
     scoreElement.textContent = `SCORE: ${score}`;
     gameStarted = false;
-    document.getElementById('startScreen').style.display = 'flex';
+    
+    // Show the start screen instead of game over text
+    const startScreen = document.getElementById('startScreen');
+    startScreen.style.display = 'flex';
+    startScreen.querySelector('h1').textContent = 'RANK UP RUNNER';
+    startScreen.querySelector('p').textContent = 'Tap to Start';
 }
 
 function updateNinja() {
@@ -368,12 +373,6 @@ function gameLoop() {
             updateNinja();
             drawNinja();
 
-            // Spawn obstacles
-            if (frameCount >= nextSpawnTime) {
-                obstacles.push(new Obstacle());
-                nextSpawnTime = frameCount + Math.floor(Math.random() * (MAX_SPAWN_TIME - MIN_SPAWN_TIME) + MIN_SPAWN_TIME);
-            }
-
             // Update and draw obstacles
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 obstacles[i].move();
@@ -387,7 +386,14 @@ function gameLoop() {
 
                 if (checkCollision(obstacles[i])) {
                     gameOver = true;
+                    resetGame();  // Reset game immediately when collision occurs
                 }
+            }
+
+            // Spawn obstacles
+            if (frameCount >= nextSpawnTime) {
+                obstacles.push(new Obstacle());
+                nextSpawnTime = frameCount + Math.floor(Math.random() * (MAX_SPAWN_TIME - MIN_SPAWN_TIME) + MIN_SPAWN_TIME);
             }
         } else if (gameOver) {
             const fontSize = canvas.height * 0.08;
