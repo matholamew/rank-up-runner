@@ -115,9 +115,9 @@ function setCanvasSize() {
     
     // Different physics values for mobile and desktop
     if (isMobileDevice()) {
-        window.GRAVITY = canvas.height * 0.0018;    // Increased gravity for mobile
-        window.JUMP_FORCE = -canvas.height * 0.03;  // Stronger jump for mobile
-        window.OBSTACLE_SPEED = canvas.width * 0.006; // Faster obstacle movement for mobile
+        window.GRAVITY = canvas.height * 0.0018;
+        window.JUMP_FORCE = -canvas.height * 0.03;
+        window.OBSTACLE_SPEED = canvas.width * 0.006;
     } else {
         window.GRAVITY = canvas.height * 0.0012;
         window.JUMP_FORCE = -canvas.height * 0.025;
@@ -126,8 +126,8 @@ function setCanvasSize() {
     window.MAX_JUMP_VELOCITY = window.JUMP_FORCE;
     
     const scaleFactor = canvas.height / 1080;
-    player.width = canvas.height * 0.15;
-    player.normalHeight = canvas.height * 0.1;
+    player.width = canvas.height * 0.2;
+    player.normalHeight = canvas.height * 0.15;
     player.duckedHeight = player.normalHeight / 2;
     player.height = player.normalHeight;
     
@@ -141,8 +141,8 @@ class Obstacle {
     constructor() {
         this.isHigh = Math.random() > 0.8;  // Only 20% chance for birds, 80% for trashcans
         const scaleFactor = canvas.height / 1080;
-        this.width = canvas.height * 0.06;
-        this.height = canvas.height * 0.075;
+        this.width = canvas.height * 0.09;
+        this.height = canvas.height * 0.11;
         this.x = canvas.width;
         if (this.isHigh) {
             const groundLevel = GROUND_Y + (player.normalHeight - this.height);
