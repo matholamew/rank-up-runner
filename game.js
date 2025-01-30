@@ -115,25 +115,24 @@ function setCanvasSize() {
     
     // Different physics values for mobile and desktop
     if (isMobileDevice()) {
-        window.GRAVITY = canvas.height * 0.0018;
-        window.JUMP_FORCE = -canvas.height * 0.03;
-        window.OBSTACLE_SPEED = canvas.width * 0.006;
-        
         // Larger scaling for mobile
         player.width = canvas.height * 0.3;  // 30% of screen height
         player.normalHeight = canvas.height * 0.25;  // 25% of screen height
-    } else {
-        window.GRAVITY = canvas.height * 0.0012;
-        window.JUMP_FORCE = -canvas.height * 0.025;
-        window.OBSTACLE_SPEED = canvas.width * 0.004;
         
-        // Desktop scaling remains the same
+        window.GRAVITY = player.normalHeight * 0.015;  // Scale with player height
+        window.JUMP_FORCE = -player.normalHeight * 0.25;  // Scale with player height
+        window.OBSTACLE_SPEED = canvas.width * 0.006;
+    } else {
+        // Desktop scaling
         player.width = canvas.height * 0.25;
         player.normalHeight = canvas.height * 0.2;
+        
+        window.GRAVITY = player.normalHeight * 0.012;  // Scale with player height
+        window.JUMP_FORCE = -player.normalHeight * 0.22;  // Scale with player height
+        window.OBSTACLE_SPEED = canvas.width * 0.004;
     }
     
     window.MAX_JUMP_VELOCITY = window.JUMP_FORCE;
-    
     player.duckedHeight = player.normalHeight / 2;
     player.height = player.normalHeight;
     
