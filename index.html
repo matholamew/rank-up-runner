@@ -28,6 +28,18 @@
             margin: auto;
             background-color: #D2D2D2;
         }
+        /* Add landscape mode specific styles */
+        @media (orientation: landscape) {
+            #gameContainer {
+                width: 90vh; /* Base width on viewport height in landscape */
+                height: 50.625vh; /* Maintain 16:9 ratio */
+                max-height: 80vh; /* Slightly smaller max height for landscape */
+                max-width: 90vw; /* Ensure it fits within viewport width */
+            }
+            #score {
+                font-size: min(3vh, 24px); /* Adjust score size for landscape */
+            }
+        }
         canvas {
             position: absolute;
             top: 0;
