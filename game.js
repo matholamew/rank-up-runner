@@ -31,7 +31,7 @@ const ninja = {
 };
 
 function loadAssets() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         let assetsLoaded = 0;
         const totalAssets = 4;
         
@@ -44,11 +44,24 @@ function loadAssets() {
             }
         }
 
+        function assetError(e) {
+            console.error('Error loading asset:', e.target.id);
+            reject(new Error(`Failed to load ${e.target.id}`));
+        }
+
         // Get asset elements
         ninjaRun1 = document.getElementById('ninjaRun1');
         ninjaRun2 = document.getElementById('ninjaRun2');
         birdSprite = document.getElementById('bird');
         enemySprite = document.getElementById('enemy');
+
+        // Log asset states
+        console.log('Initial asset states:', {
+            ninjaRun1: ninjaRun1?.complete,
+            ninjaRun2: ninjaRun2?.complete,
+            bird: birdSprite?.complete,
+            enemy: enemySprite?.complete
+        });
 
         // Set up load handlers
         ninjaRun1.onload = assetLoaded;
@@ -56,40 +69,56 @@ function loadAssets() {
         birdSprite.onload = assetLoaded;
         enemySprite.onload = assetLoaded;
 
+        // Set up error handlers
+        ninjaRun1.onerror = assetError;
+        ninjaRun2.onerror = assetError;
+        birdSprite.onerror = assetError;
+        enemySprite.onerror = assetError;
+
         // Handle already loaded images
-        if (ninjaRun1.complete) assetLoaded();
-        if (ninjaRun2.complete) assetLoaded();
-        if (birdSprite.complete) assetLoaded();
-        if (enemySprite.complete) assetLoaded();
+        if (ninjaRun1?.complete) assetLoaded();
+        if (ninjaRun2?.complete) assetLoaded();
+        if (birdSprite?.complete) assetLoaded();
+        if (enemySprite?.complete) assetLoaded();
     });
 }
 
 async function initGame() {
-    // Get DOM elements
-    canvas = document.getElementById('gameCanvas');
-    ctx = canvas.getContext('2d');
-    scoreElement = document.getElementById('score');
+    try {
+        // Get DOM elements
+        canvas = document.getElementById('gameCanvas');
+        ctx = canvas.getContext('2d');
+        scoreElement = document.getElementById('score');
 
-    await loadAssets();
+        console.log('Canvas size:', canvas.width, canvas.height);
+        
+        // Wait for assets to load
+        await loadAssets();
 
-    // Debug log to check if sprites are loaded
-    console.log('Sprites loaded:', {
-        ninjaRun1: ninjaRun1.complete,
-        ninjaRun2: ninjaRun2.complete,
-        bird: birdSprite.complete,
-        enemy: enemySprite.complete
-    });
+        // Debug log to check if sprites are loaded
+        console.log('Sprites loaded:', {
+            ninjaRun1: ninjaRun1?.complete,
+            ninjaRun2: ninjaRun2?.complete,
+            bird: birdSprite?.complete,
+            enemy: enemySprite?.complete
+        });
 
-    // Set up event listeners
-    window.addEventListener('resize', setCanvasSize);
-    canvas.addEventListener('touchstart', handleTouchStart);
-    canvas.addEventListener('touchend', handleTouchEnd);
+        // Set up event listeners
+        window.addEventListener('resize', setCanvasSize);
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchend', handleTouchEnd);
 
-    // Set initial ninja position
-    ninja.x = canvas.width * 0.2;
+        // Set initial ninja position
+        ninja.x = canvas.width * 0.2;
 
-    setCanvasSize();
-    gameLoop();
+        setCanvasSize();
+        
+        // Start game loop
+        console.log('Starting game loop');
+        requestAnimationFrame(gameLoop);
+    } catch (error) {
+        console.error('Game initialization failed:', error);
+    }
 }
 
 function setCanvasSize() {
@@ -271,53 +300,68 @@ function drawDebugInfo() {
 }
 
 function gameLoop() {
-    ctx.fillStyle = '#D2D2D2';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    try {
+        ctx.fillStyle = '#D2D2D2';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    if (!gameOver) {
-        frameCount++;
-        
-        // Draw ground line
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, GROUND_Y + ninja.normalHeight, canvas.width, 2);
-
-        updateNinja();
-        drawNinja();
-
-        // Draw debug info
+        // Draw debug info even if game is over
         drawDebugInfo();
 
-        // Spawn obstacles
-        if (frameCount >= nextSpawnTime) {
-            obstacles.push(new Obstacle());
-            nextSpawnTime = frameCount + Math.floor(Math.random() * (MAX_SPAWN_TIME - MIN_SPAWN_TIME) + MIN_SPAWN_TIME);
-        }
+        if (!gameOver) {
+            frameCount++;
+            
+            // Draw ground line
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, GROUND_Y + ninja.normalHeight, canvas.width, 2);
 
-        // Update and draw obstacles
-        for (let i = obstacles.length - 1; i >= 0; i--) {
-            obstacles[i].move();
-            obstacles[i].draw();
+            updateNinja();
+            drawNinja();
 
-            if (obstacles[i].x + obstacles[i].width < 0) {
-                obstacles.splice(i, 1);
-                score++;
-                scoreElement.textContent = `Score: ${score}`;
+            // Spawn obstacles
+            if (frameCount >= nextSpawnTime) {
+                obstacles.push(new Obstacle());
+                nextSpawnTime = frameCount + Math.floor(Math.random() * (MAX_SPAWN_TIME - MIN_SPAWN_TIME) + MIN_SPAWN_TIME);
             }
 
-            if (checkCollision(obstacles[i])) {
-                gameOver = true;
+            // Update and draw obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].move();
+                obstacles[i].draw();
+
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1);
+                    score++;
+                    scoreElement.textContent = `Score: ${score}`;
+                }
+
+                if (checkCollision(obstacles[i])) {
+                    gameOver = true;
+                }
             }
+        } else {
+            const fontSize = canvas.height * 0.05;
+            ctx.fillStyle = 'black';
+            ctx.font = `${fontSize}px Arial`;
+            ctx.fillText('Game Over!', canvas.width/2 - fontSize * 2, canvas.height/2);
+            ctx.font = `${fontSize * 0.6}px Arial`;
+            ctx.fillText('Tap to Restart', canvas.width/2 - fontSize * 2, canvas.height/2 + fontSize);
         }
-    } else {
-        const fontSize = canvas.height * 0.05;
-        ctx.fillStyle = 'black';
-        ctx.font = `${fontSize}px Arial`;
-        ctx.fillText('Game Over!', canvas.width/2 - fontSize * 2, canvas.height/2);
-        ctx.font = `${fontSize * 0.6}px Arial`;
-        ctx.fillText('Tap to Restart', canvas.width/2 - fontSize * 2, canvas.height/2 + fontSize);
+
+        requestAnimationFrame(gameLoop);
+    } catch (error) {
+        console.error('Game loop error:', error);
     }
-
-    requestAnimationFrame(gameLoop);
 }
 
-document.addEventListener('DOMContentLoaded', initGame); 
+// Add this function to check if we're on mobile
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Initialize game when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing game');
+    initGame().catch(error => {
+        console.error('Failed to initialize game:', error);
+    });
+}); 
