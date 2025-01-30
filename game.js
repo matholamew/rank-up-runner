@@ -115,20 +115,20 @@ function setCanvasSize() {
     
     // Different physics values for mobile and desktop
     if (isMobileDevice()) {
-        // Larger scaling for mobile
-        player.width = canvas.height * 0.3;  // 30% of screen height
-        player.normalHeight = canvas.height * 0.25;  // 25% of screen height
+        // Player size is 1/3 of game height
+        player.normalHeight = canvas.height * 0.33;  // 33% of screen height
+        player.width = player.normalHeight * 1.2;    // Width is 120% of height
         
-        window.GRAVITY = player.normalHeight * 0.015;  // Scale with player height
-        window.JUMP_FORCE = -player.normalHeight * 0.25;  // Scale with player height
+        window.GRAVITY = player.normalHeight * 0.015;
+        window.JUMP_FORCE = -player.normalHeight * 0.25;
         window.OBSTACLE_SPEED = canvas.width * 0.006;
     } else {
-        // Desktop scaling
-        player.width = canvas.height * 0.25;
-        player.normalHeight = canvas.height * 0.2;
+        // Keep same proportions for desktop
+        player.normalHeight = canvas.height * 0.33;
+        player.width = player.normalHeight * 1.2;
         
-        window.GRAVITY = player.normalHeight * 0.012;  // Scale with player height
-        window.JUMP_FORCE = -player.normalHeight * 0.22;  // Scale with player height
+        window.GRAVITY = player.normalHeight * 0.012;
+        window.JUMP_FORCE = -player.normalHeight * 0.22;
         window.OBSTACLE_SPEED = canvas.width * 0.004;
     }
     
