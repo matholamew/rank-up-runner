@@ -12,6 +12,10 @@ let nextSpawnTime = 100;
 const ANIMATION_SPEED = 8;
 let GROUND_Y;
 
+// Move these to the top with other game constants
+const MIN_SPAWN_TIME = isMobileDevice() ? 50 : 70;  // Faster for mobile
+const MAX_SPAWN_TIME = isMobileDevice() ? 130 : 170; // Faster for mobile
+
 // Add this function to detect mobile devices
 function isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -173,12 +177,6 @@ class Obstacle {
     }
 }
 
-// Update spawn times for mobile
-if (isMobileDevice()) {
-    const MIN_SPAWN_TIME = 50;  // Faster minimum spawn time for mobile
-    const MAX_SPAWN_TIME = 130; // Faster maximum spawn time for mobile
-}
-
 function resetGame() {
     obstacles = [];
     score = 0;
@@ -250,7 +248,6 @@ function checkCollision(obstacle) {
 }
 
 function gameLoop() {
-    // Clear and fill background with #D2D2D2
     ctx.fillStyle = '#D2D2D2';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
