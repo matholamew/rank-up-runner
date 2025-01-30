@@ -174,17 +174,17 @@ function setCanvasSize() {
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
 
-    // Physics calculations - adjusted for higher, longer arc
+    // Physics calculations - adjusted for much higher and longer arc
     if (isMobileDevice()) {
-        window.GRAVITY = canvas.height * 0.003;      // Reduced gravity for longer hang time
-        window.JUMP_FORCE = -canvas.height * 0.05;   // Stronger initial jump force
-        window.MAX_FALL_SPEED = canvas.height * 0.035; // Slightly reduced fall speed
+        window.GRAVITY = canvas.height * 0.0015;     // Much lower gravity for longer hang time
+        window.JUMP_FORCE = -canvas.height * 0.06;   // Much stronger initial jump force
+        window.MAX_FALL_SPEED = canvas.height * 0.03; // Lower fall speed for smoother landing
         window.OBSTACLE_SPEED = canvas.width * 0.008;
     } else {
         // Desktop physics (same values)
-        window.GRAVITY = canvas.height * 0.003;
-        window.JUMP_FORCE = -canvas.height * 0.05;
-        window.MAX_FALL_SPEED = canvas.height * 0.035;
+        window.GRAVITY = canvas.height * 0.0015;
+        window.JUMP_FORCE = -canvas.height * 0.06;
+        window.MAX_FALL_SPEED = canvas.height * 0.03;
         window.OBSTACLE_SPEED = canvas.width * 0.006;
     }
     
@@ -201,9 +201,9 @@ class Obstacle {
         this.x = canvas.width;
         
         if (this.isHigh) {
-            // Adjust flying heights for 1/3 screen height jump
-            const minHeight = GROUND_Y - (canvas.height / 3);  // Exactly at jump height
-            const maxHeight = GROUND_Y - (canvas.height / 3) * 0.8;  // Slightly below max height
+            // Adjust flying heights for higher jump
+            const minHeight = GROUND_Y - (canvas.height * 0.45);  // Higher minimum height
+            const maxHeight = GROUND_Y - (canvas.height * 0.35);  // Higher maximum height
             this.y = Math.random() * (maxHeight - minHeight) + minHeight;
         } else {
             this.y = GROUND_Y + (ninja.normalHeight - this.height);
