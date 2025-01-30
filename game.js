@@ -97,18 +97,18 @@ function setCanvasSize() {
     canvas.width = container.clientWidth;
     canvas.height = container.clientHeight;
     
-    GROUND_Y = canvas.height - (canvas.height * 0.2);  // Move ground up slightly
+    GROUND_Y = canvas.height - (canvas.height * 0.2);
     
     // Set ninja size to a smaller proportion of game height
-    ninja.normalHeight = canvas.height * 0.2;   // Now 1/5 of screen height
+    ninja.normalHeight = canvas.height * 0.2;
     ninja.width = ninja.normalHeight * 0.8;
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
     
-    // Adjust physics values for new scale
-    window.GRAVITY = ninja.normalHeight * 0.02;
-    window.JUMP_FORCE = -ninja.normalHeight * 0.45;
-    window.MAX_FALL_SPEED = ninja.normalHeight * 0.3;
+    // Adjust physics for lower, more natural jump arc
+    window.GRAVITY = ninja.normalHeight * 0.025;     // Increased gravity
+    window.JUMP_FORCE = -ninja.normalHeight * 0.25;  // Reduced initial jump force
+    window.MAX_FALL_SPEED = ninja.normalHeight * 0.2; // Lower max fall speed
     window.OBSTACLE_SPEED = canvas.width * 0.006;
     
     if (!gameOver) {
@@ -119,17 +119,16 @@ function setCanvasSize() {
 class Obstacle {
     constructor() {
         this.isHigh = Math.random() > 0.7;
-        this.width = ninja.normalHeight * 0.8;  // Slightly narrower
-        this.height = this.isHigh ? ninja.normalHeight * 0.6 : ninja.normalHeight * 0.8;  // Slightly shorter
+        this.width = ninja.normalHeight * 0.8;
+        this.height = this.isHigh ? ninja.normalHeight * 0.6 : ninja.normalHeight * 0.8;
         this.x = canvas.width;
         
         if (this.isHigh) {
-            // Adjust flying heights for new scale
-            const minHeight = GROUND_Y - ninja.normalHeight * 1.5;
-            const maxHeight = GROUND_Y - ninja.normalHeight * 1.0;
+            // Adjust flying heights for lower jump height
+            const minHeight = GROUND_Y - ninja.normalHeight * 0.8;  // Lower minimum height
+            const maxHeight = GROUND_Y - ninja.normalHeight * 0.6;  // Lower maximum height
             this.y = Math.random() * (maxHeight - minHeight) + minHeight;
         } else {
-            // Ground enemy
             this.y = GROUND_Y + (ninja.normalHeight - this.height);
         }
     }
