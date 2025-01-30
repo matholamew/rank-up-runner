@@ -154,7 +154,6 @@ function setCanvasSize() {
     const oldWidth = canvas.width;
     const oldHeight = canvas.height;
     
-    // Set canvas size
     canvas.width = container.clientWidth;
     canvas.height = container.clientHeight;
     
@@ -174,17 +173,17 @@ function setCanvasSize() {
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
 
-    // Physics calculations - adjusted for much higher and longer arc
+    // Physics calculations for exactly 1/3 game height jump
     if (isMobileDevice()) {
-        window.GRAVITY = canvas.height * 0.0015;     // Much lower gravity for longer hang time
-        window.JUMP_FORCE = -canvas.height * 0.06;   // Much stronger initial jump force
-        window.MAX_FALL_SPEED = canvas.height * 0.03; // Lower fall speed for smoother landing
+        window.GRAVITY = canvas.height * 0.002;      // Balanced gravity
+        window.JUMP_FORCE = -canvas.height * 0.035;  // Force to reach 1/3 height
+        window.MAX_FALL_SPEED = canvas.height * 0.035; // Matching fall speed
         window.OBSTACLE_SPEED = canvas.width * 0.008;
     } else {
         // Desktop physics (same values)
-        window.GRAVITY = canvas.height * 0.0015;
-        window.JUMP_FORCE = -canvas.height * 0.06;
-        window.MAX_FALL_SPEED = canvas.height * 0.03;
+        window.GRAVITY = canvas.height * 0.002;
+        window.JUMP_FORCE = -canvas.height * 0.035;
+        window.MAX_FALL_SPEED = canvas.height * 0.035;
         window.OBSTACLE_SPEED = canvas.width * 0.006;
     }
     
@@ -201,9 +200,9 @@ class Obstacle {
         this.x = canvas.width;
         
         if (this.isHigh) {
-            // Adjust flying heights for higher jump
-            const minHeight = GROUND_Y - (canvas.height * 0.45);  // Higher minimum height
-            const maxHeight = GROUND_Y - (canvas.height * 0.35);  // Higher maximum height
+            // Adjust flying heights for exactly 1/3 screen height
+            const minHeight = GROUND_Y - (canvas.height / 3);     // Exactly 1/3 height
+            const maxHeight = GROUND_Y - (canvas.height / 3) * 0.9; // Slightly below max
             this.y = Math.random() * (maxHeight - minHeight) + minHeight;
         } else {
             this.y = GROUND_Y + (ninja.normalHeight - this.height);
