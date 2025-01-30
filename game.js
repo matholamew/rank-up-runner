@@ -84,6 +84,17 @@ function loadAssets() {
     });
 }
 
+function setGameContainerSize() {
+    const gameContainer = document.getElementById('gameContainer');
+    const windowHeight = window.innerHeight;
+    const gameHeight = Math.floor(windowHeight * 0.9); // 90% of window height
+    const padding = Math.floor(windowHeight * 0.02); // 2% padding top and bottom
+    
+    gameContainer.style.height = `${gameHeight}px`;
+    document.body.style.paddingTop = `${padding}px`;
+    document.body.style.paddingBottom = `${padding}px`;
+}
+
 async function initGame() {
     try {
         // Get DOM elements
@@ -114,12 +125,8 @@ async function initGame() {
 
         // Set up event listeners
         window.addEventListener('resize', () => {
+            setGameContainerSize();
             setCanvasSize();
-            if (isMobileDevice()) {
-                requestAnimationFrame(() => {
-                    drawNinja();
-                });
-            }
         });
 
         // Set initial ninja position
@@ -127,6 +134,9 @@ async function initGame() {
         ninja.y = GROUND_Y;
 
         setCanvasSize();
+        
+        // Set initial size
+        setGameContainerSize();
         
         // Start game loop
         console.log('Starting game loop');

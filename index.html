@@ -15,15 +15,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100%;
             margin: 0;
             overflow: hidden;
-            padding: 2vh 0;
+            padding: 0;
         }
         #gameContainer {
             position: relative;
             width: 98vw;
-            height: 96vh;
             max-width: 275vh;
             margin: 0 auto;
             background-color: #D2D2D2;
@@ -97,13 +96,6 @@
             font-family: Arial, sans-serif;
             font-size: min(4vh, 32px);
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        @media (orientation: landscape) {
-            #gameContainer {
-                height: 96vh;
-                aspect-ratio: 16/9;
-                max-height: 96vh;
-            }
         }
     </style>
     <script src="game.js" defer></script>
