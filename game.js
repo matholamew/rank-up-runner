@@ -28,7 +28,9 @@ const player = {
     velocityY: 0,
     isJumping: false,
     isDucking: false,
-    currentFrame: 0
+    currentFrame: 0,
+    touchStartTime: 0,
+    touchTimer: null
 };
 
 window.assetLoaded = function() {
@@ -67,8 +69,6 @@ function initGame() {
     canvas.addEventListener('touchstart', handleTouchStart);
     canvas.addEventListener('touchend', handleTouchEnd);
     
-    // Variable to track touch duration
-    window.touchStartTime = 0;
     window.longPressThreshold = 150; // milliseconds to trigger duck
 
     setCanvasSize();
@@ -303,24 +303,28 @@ function handleTouchStart(event) {
         return;
     }
     
-    window.touchStartTime = Date.now();
+    player.touchStartTime = Date.now();
     
-    // Start ducking check timer
-    window.touchTimer = setTimeout(() => {
-        if (!player.isJumping) {
+    player.touchTimer = requestAnimationFrame(function checkDuck() {
+        const touchDuration = Date.now() - player.touchStartTime;
+        if (!player.isJumping && touchDuration > window.longPressThreshold) {
             player.isDucking = true;
             player.height = player.duckedHeight;
             player.y = GROUND_Y + (player.normalHeight - player.duckedHeight);
+        } else if (!gameOver) {
+            player.touchTimer = requestAnimationFrame(checkDuck);
         }
-    }, window.longPressThreshold);
+    });
 }
 
 function handleTouchEnd(event) {
     event.preventDefault();
     
-    clearTimeout(window.touchTimer);
+    if (player.touchTimer) {
+        cancelAnimationFrame(player.touchTimer);
+    }
     
-    const touchDuration = Date.now() - window.touchStartTime;
+    const touchDuration = Date.now() - (player.touchStartTime || 0);
     
     if (touchDuration < window.longPressThreshold) {
         // Short tap - Jump
