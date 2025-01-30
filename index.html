@@ -21,21 +21,21 @@
         }
         #gameContainer {
             position: relative;
-            width: 90vw;
-            height: 45vw; /* Slightly shorter ratio */
-            max-height: 90vh;
-            max-width: 150vh; /* Adjusted ratio */
+            width: 100vw;
+            height: 100vh;
+            max-width: 177.78vh; /* 16:9 aspect ratio */
+            max-height: 56.25vw; /* 16:9 aspect ratio */
             margin: auto;
             background-color: #D2D2D2;
         }
         /* Add landscape mode specific styles */
         @media (orientation: landscape) {
             #gameContainer {
-                width: 95vw;
-                height: 70vh; /* Further reduced height */
-                max-height: 70vh;
-                max-width: 95vw;
-                margin: auto; /* Reset margin to center properly */
+                width: 100vw;
+                height: 85vh;
+                max-height: 85vh;
+                max-width: 177.78vh; /* 16:9 aspect ratio */
+                margin: auto;
             }
             #score {
                 font-size: min(4vh, 28px);
