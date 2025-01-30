@@ -24,8 +24,6 @@ const ninja = {
     normalHeight: 0,
     duckedHeight: 0,
     velocityY: 0,
-    velocityX: 0,
-    baseX: 50,  // Store original X position
     isJumping: false,
     isDucking: false,
     currentFrame: 0,
@@ -33,9 +31,8 @@ const ninja = {
 };
 
 function loadAssets() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         let assetsLoaded = 0;
-        let errors = 0;
         const totalAssets = 4;
         
         function assetLoaded() {
@@ -47,44 +44,17 @@ function loadAssets() {
             }
         }
 
-        function assetError(e) {
-            errors++;
-            console.error('Error loading asset:', e.target.id);
-            console.error('Source:', e.target.src);
-            if (errors === totalAssets) {
-                reject('Failed to load game assets');
-            }
-        }
-
-        // Get asset elements and log their paths
+        // Get asset elements
         ninjaRun1 = document.getElementById('ninjaRun1');
         ninjaRun2 = document.getElementById('ninjaRun2');
         birdSprite = document.getElementById('bird');
         enemySprite = document.getElementById('enemy');
-
-        console.log('Asset paths:', {
-            ninjaRun1: ninjaRun1?.src,
-            ninjaRun2: ninjaRun2?.src,
-            bird: birdSprite?.src,
-            enemy: enemySprite?.src
-        });
-
-        if (!ninjaRun1 || !ninjaRun2 || !birdSprite || !enemySprite) {
-            reject('Could not find one or more game assets');
-            return;
-        }
 
         // Set up load handlers
         ninjaRun1.onload = assetLoaded;
         ninjaRun2.onload = assetLoaded;
         birdSprite.onload = assetLoaded;
         enemySprite.onload = assetLoaded;
-
-        // Set up error handlers
-        ninjaRun1.onerror = assetError;
-        ninjaRun2.onerror = assetError;
-        birdSprite.onerror = assetError;
-        enemySprite.onerror = assetError;
 
         // Handle already loaded images
         if (ninjaRun1.complete) assetLoaded();
@@ -95,47 +65,31 @@ function loadAssets() {
 }
 
 async function initGame() {
-    try {
-        // Get DOM elements
-        canvas = document.getElementById('gameCanvas');
-        ctx = canvas.getContext('2d');
-        scoreElement = document.getElementById('score');
+    // Get DOM elements
+    canvas = document.getElementById('gameCanvas');
+    ctx = canvas.getContext('2d');
+    scoreElement = document.getElementById('score');
 
-        if (!canvas || !ctx || !scoreElement) {
-            throw new Error('Could not initialize game elements');
-        }
+    await loadAssets();
 
-        console.log('Loading assets...');
-        await loadAssets();
-        console.log('Assets loaded successfully');
+    // Debug log to check if sprites are loaded
+    console.log('Sprites loaded:', {
+        ninjaRun1: ninjaRun1.complete,
+        ninjaRun2: ninjaRun2.complete,
+        bird: birdSprite.complete,
+        enemy: enemySprite.complete
+    });
 
-        // Debug log to check if sprites are loaded
-        console.log('Sprites loaded:', {
-            ninjaRun1: ninjaRun1.complete,
-            ninjaRun2: ninjaRun2.complete,
-            bird: birdSprite.complete,
-            enemy: enemySprite.complete
-        });
+    // Set up event listeners
+    window.addEventListener('resize', setCanvasSize);
+    canvas.addEventListener('touchstart', handleTouchStart);
+    canvas.addEventListener('touchend', handleTouchEnd);
 
-        // Set up event listeners
-        window.addEventListener('resize', setCanvasSize);
-        canvas.addEventListener('touchstart', handleTouchStart);
-        canvas.addEventListener('touchend', handleTouchEnd);
+    // Set initial ninja position
+    ninja.x = canvas.width * 0.2;
 
-        // Set initial ninja position
-        ninja.x = canvas.width * 0.2;
-
-        setCanvasSize();
-        gameLoop();
-    } catch (error) {
-        console.error('Game initialization failed:', error);
-        // Display error message on canvas if possible
-        if (ctx) {
-            ctx.fillStyle = 'black';
-            ctx.font = '20px Arial';
-            ctx.fillText('Failed to load game. Please refresh.', 50, 50);
-        }
-    }
+    setCanvasSize();
+    gameLoop();
 }
 
 function setCanvasSize() {
@@ -147,14 +101,14 @@ function setCanvasSize() {
     
     // Set ninja size to 1/3 of game height
     ninja.normalHeight = canvas.height * 0.33;
-    ninja.width = ninja.normalHeight * 0.8;  // Make width slightly smaller than height
+    ninja.width = ninja.normalHeight * 0.8;
     ninja.duckedHeight = ninja.normalHeight * 0.5;
     ninja.height = ninja.normalHeight;
     
-    // Physics values scaled to ninja size
-    window.GRAVITY = ninja.normalHeight * 0.022;  // Reduced gravity
-    window.JUMP_FORCE = -ninja.normalHeight * 0.35;  // Adjusted initial jump force
-    window.JUMP_FORWARD = ninja.width * 0.15;  // Forward momentum during jump
+    // Adjusted physics values for better arc
+    window.GRAVITY = ninja.normalHeight * 0.015;  // Reduced gravity
+    window.JUMP_FORCE = -ninja.normalHeight * 0.35;  // Initial jump velocity
+    window.MAX_FALL_SPEED = ninja.normalHeight * 0.25;  // Maximum fall speed
     window.OBSTACLE_SPEED = canvas.width * 0.006;
     
     if (!gameOver) {
@@ -219,8 +173,9 @@ function handleTouchEnd(event) {
     const touchDuration = Date.now() - (ninja.touchStartTime || 0);
     
     if (touchDuration < 200 && ninja.canJump) {
-        ninja.baseX = ninja.x;  // Store current X position before jump
-        ninja.velocityY = window.JUMP_FORCE;
+        // Add horizontal position-based jump force variation
+        const jumpForceMultiplier = 1.0 + (ninja.x / canvas.width) * 0.1;
+        ninja.velocityY = window.JUMP_FORCE * jumpForceMultiplier;
         ninja.isJumping = true;
         ninja.canJump = false;
         ninja.isDucking = false;
@@ -251,23 +206,15 @@ function resetGame() {
 function updateNinja() {
     if (ninja.isJumping) {
         ninja.velocityY += window.GRAVITY;
+        // Limit fall speed
+        ninja.velocityY = Math.min(ninja.velocityY, window.MAX_FALL_SPEED);
         ninja.y += ninja.velocityY;
-
-        // Add forward arc movement
-        if (ninja.velocityY < 0) {
-            // Moving up - go forward
-            ninja.x = ninja.baseX + window.JUMP_FORWARD;
-        } else {
-            // Moving down - return to original position
-            ninja.x = ninja.baseX + window.JUMP_FORWARD * (1 - (-ninja.velocityY / window.JUMP_FORCE));
-        }
 
         if (ninja.y > GROUND_Y) {
             ninja.y = GROUND_Y;
             ninja.velocityY = 0;
             ninja.isJumping = false;
             ninja.canJump = true;
-            ninja.x = ninja.baseX;  // Reset X position
         }
     }
 }
@@ -367,8 +314,4 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Wait for both DOM and window load to ensure everything is ready
-window.addEventListener('load', () => {
-    console.log('Window loaded, initializing game...');
-    initGame();
-}); 
+document.addEventListener('DOMContentLoaded', initGame); 
