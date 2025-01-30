@@ -338,12 +338,15 @@ function checkCollision(obstacle) {
 
 // Add debug info
 function drawDebugInfo() {
+    // Comment out debug text drawing
+    /*
     ctx.fillStyle = 'black';
     ctx.font = '14px Arial';
     ctx.fillText(`Ninja: ${Math.round(ninja.x)},${Math.round(ninja.y)}`, 10, 20);
     ctx.fillText(`Jumping: ${ninja.isJumping}`, 10, 40);
     ctx.fillText(`Ducking: ${ninja.isDucking}`, 10, 60);
     ctx.fillText(`Obstacles: ${obstacles.length}`, 10, 80);
+    */
 }
 
 function gameLoop() {
@@ -356,8 +359,8 @@ function gameLoop() {
         ctx.fillStyle = '#D2D2D2';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw debug info even if game is over
-        drawDebugInfo();
+        // Comment out debug info call
+        // drawDebugInfo();
 
         if (!gameOver) {
             frameCount++;
@@ -383,7 +386,7 @@ function gameLoop() {
                 if (obstacles[i].x + obstacles[i].width < 0) {
                     obstacles.splice(i, 1);
                     score++;
-                    scoreElement.textContent = `Score: ${score}`;
+                    scoreElement.textContent = `SCORE: ${score}`;
                 }
 
                 if (checkCollision(obstacles[i])) {
@@ -391,12 +394,12 @@ function gameLoop() {
                 }
             }
         } else {
-            const fontSize = canvas.height * 0.05;
+            const fontSize = canvas.height * 0.08;
             ctx.fillStyle = 'black';
             ctx.font = `${fontSize}px Arial`;
-            ctx.fillText('Game Over!', canvas.width/2 - fontSize * 2, canvas.height/2);
+            ctx.fillText('GAME OVER!', canvas.width/2 - fontSize * 2.5, canvas.height/2);
             ctx.font = `${fontSize * 0.6}px Arial`;
-            ctx.fillText('Tap to Restart', canvas.width/2 - fontSize * 2, canvas.height/2 + fontSize);
+            ctx.fillText('TAP TO RESTART', canvas.width/2 - fontSize * 2.5, canvas.height/2 + fontSize);
         }
 
         requestAnimationFrame(gameLoop);
