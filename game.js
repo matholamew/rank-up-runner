@@ -24,6 +24,8 @@ const ninja = {
     normalHeight: 0,
     duckedHeight: 0,
     velocityY: 0,
+    velocityX: 0,
+    baseX: 50,  // Store original X position
     isJumping: false,
     isDucking: false,
     currentFrame: 0,
@@ -106,8 +108,9 @@ function setCanvasSize() {
     ninja.height = ninja.normalHeight;
     
     // Physics values scaled to ninja size
-    window.GRAVITY = ninja.normalHeight * 0.03;  // Increased gravity
-    window.JUMP_FORCE = -ninja.normalHeight * 0.4;  // Stronger jump
+    window.GRAVITY = ninja.normalHeight * 0.022;  // Reduced gravity
+    window.JUMP_FORCE = -ninja.normalHeight * 0.35;  // Adjusted initial jump force
+    window.JUMP_FORWARD = ninja.width * 0.15;  // Forward momentum during jump
     window.OBSTACLE_SPEED = canvas.width * 0.006;
     
     if (!gameOver) {
@@ -172,6 +175,7 @@ function handleTouchEnd(event) {
     const touchDuration = Date.now() - (ninja.touchStartTime || 0);
     
     if (touchDuration < 200 && ninja.canJump) {
+        ninja.baseX = ninja.x;  // Store current X position before jump
         ninja.velocityY = window.JUMP_FORCE;
         ninja.isJumping = true;
         ninja.canJump = false;
@@ -205,11 +209,21 @@ function updateNinja() {
         ninja.velocityY += window.GRAVITY;
         ninja.y += ninja.velocityY;
 
+        // Add forward arc movement
+        if (ninja.velocityY < 0) {
+            // Moving up - go forward
+            ninja.x = ninja.baseX + window.JUMP_FORWARD;
+        } else {
+            // Moving down - return to original position
+            ninja.x = ninja.baseX + window.JUMP_FORWARD * (1 - (-ninja.velocityY / window.JUMP_FORCE));
+        }
+
         if (ninja.y > GROUND_Y) {
             ninja.y = GROUND_Y;
             ninja.velocityY = 0;
             ninja.isJumping = false;
             ninja.canJump = true;
+            ninja.x = ninja.baseX;  // Reset X position
         }
     }
 }
